@@ -9,7 +9,9 @@ function Observe(vm, data) {
     // if (!isObject(data)) {
     //     return
     // }
-    def(vm, '_ob_', this)
+    if (!vm._ob_) {
+        def(vm, '_ob_', this)
+    }
     this.walk(vm, data)
     this.dep = new Dep()
 
@@ -52,14 +54,12 @@ Observe.prototype.definReactive = function (vm, data, key, value) {
     if (isObject(value) && !Array.isArray(value)) {
         new Observe(vm, value)
     }
-    
 
     Object.defineProperty(vm, key, {
         configurable: false, //不可删除
         enumerable: true, //可迭代
         get: () => {
             const ob = vm._ob_
-            console.log(ob);
             ob.dep.depend(key, new Watcher(vm,key))
             console.log('getter', key)
             return value
@@ -74,6 +74,8 @@ Observe.prototype.definReactive = function (vm, data, key, value) {
             }
             
             // notify
+            const ob = vm._ob_
+            ob.dep.notify(key)
         }
     })
 }

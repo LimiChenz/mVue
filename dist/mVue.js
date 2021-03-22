@@ -27,16 +27,18 @@
    };
 
    Dep.prototype.notify = function (key) {
-       this.subs[key].forEach(element => {
-           element.update();
-       });
+       if (Array.isArray(this.subs[key])) {
+           this.subs[key].forEach(element => {
+               element.update();
+           });
+       }
+       
    };
 
    Dep.taget = null;
 
    // 观察者Watcher类
    function Watcher(vm,key,node,attrs){
-       
        this.vm = vm;
        this.key = key;
        this.node = node;
@@ -59,7 +61,9 @@
        // if (!isObject(data)) {
        //     return
        // }
-       def(vm, '_ob_', this);
+       if (!vm._ob_) {
+           def(vm, '_ob_', this);
+       }
        this.walk(vm, data);
        this.dep = new Dep();
 
@@ -102,14 +106,12 @@
        if (isObject(value) && !Array.isArray(value)) {
            new Observe(vm, value);
        }
-       
 
        Object.defineProperty(vm, key, {
            configurable: false, //不可删除
            enumerable: true, //可迭代
            get: () => {
                const ob = vm._ob_;
-               console.log(ob);
                ob.dep.depend(key, new Watcher(vm,key));
                console.log('getter', key);
                return value
@@ -124,6 +126,8 @@
                }
                
                // notify
+               const ob = vm._ob_;
+               ob.dep.notify(key);
            }
        });
    };
@@ -135,13 +139,15 @@
        this.$option = options;
        this.$el = options.el;
 
-       let data = this.$option.data;
        // 初始化数据
+       let data = this.$option.data;
        if (typeof this.$option.data === 'function') {
            data = this.$option.data();
        }
        this._observe(data);
 
+
+       
        console.log(this);
        // 
        // this._complieDom()

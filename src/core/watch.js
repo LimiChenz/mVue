@@ -1,7 +1,6 @@
 import Dep from './dep'
 // 观察者Watcher类
 function Watcher(vm,key,node,attrs){
-    
     this.vm = vm
     this.key = key
     this.node = node

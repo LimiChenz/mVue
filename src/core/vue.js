@@ -7,13 +7,15 @@ Vue.prototype._init = function(options) {
     this.$option = options;
     this.$el = options.el;
 
-    let data = this.$option.data;
     // 初始化数据
+    let data = this.$option.data;
     if (typeof this.$option.data === 'function') {
         data = this.$option.data();
     }
     this._observe(data);
 
+
+    
     console.log(this);
     // 
     // this._complieDom()

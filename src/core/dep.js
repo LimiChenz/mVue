@@ -19,9 +19,12 @@ Dep.prototype.depend = function (key, sub) {
 }
 
 Dep.prototype.notify = function (key) {
-    this.subs[key].forEach(element => {
-        element.update()
-    });
+    if (Array.isArray(this.subs[key])) {
+        this.subs[key].forEach(element => {
+            element.update()
+        });
+    }
+    
 }
 
 Dep.taget = null
