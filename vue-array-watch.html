@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <span>123456</span>
+      <span>aaaaaa</span>
+      <div>qqqqqq</div>
+    </div>
+    <canvas
+      id="myCanvas"
+      width="300"
+      height="150"
+      style="border: 1px solid #d3d3d3"
+    >
+      Your browser does not support the HTML5 canvas tag.
+    </canvas>
+    <button onclick="copy()">复制</button>
+
+    <script type="text/javascript">
+      let app = document.querySelector("#app");
+      console.log(app.childNodes, app.attributes);
+      const patchArray = (function () {
+        const methodsToPatch = [
+          "push",
+          "pop",
+          "shift",
+          "unshift",
+          "splice",
+          "reverse",
+          "sort",
+        ];
+        //设置对象属性的工具方法
+        function def(obj, key, val) {
+          console.log("VAL...", val);
+          Object.defineProperty(obj, key, {
+            value: val,
+            enumerable: true,
+            writable: true,
+            configurable: true,
+          });
+        }
+        const arrayProto = Array.prototype, //缓存Array的原型
+          arrayMethods = Object.create(arrayProto); //继承Array的原型
+        methodsToPatch.forEach(function (method, index) {
+          def(arrayMethods, method, function (...args) {
+            //首先调用Array原型的方法
+            const old = this.concat([]);
+            const res = arrayProto[method].apply(this, args);
+            let inserted = null,
+              deleted = null;
+            let _callback_ = this._callback_;
+            //记录插入的值
+            switch (method) {
+              case "push":
+              case "unshift":
+                console.log("args...", args);
+                inserted = args;
+                break;
+              case "splice":
+                console.log("args...", args);
+
+                //这是新增的
+                inserted = args.slice(2);
+                console.log("inserted...", inserted);
+                let start = args[0],
+                  end = start + args[1];
+                deleted = old.slice(start, end);
+                break;
+              case "pop":
+              case "shift":
+                deleted = res;
+            }
+            _callback_(inserted, deleted);
+            return res;
+          });
+        });
+        return function (target, callback) {
+          def(target, "_callback_", callback); //定义回调
+          console.log("object...", target);
+          //看看浏览器支不支持__proto__这个属性，通过改变__proto__的值，可以设置对象的原型
+          if ("__proto__" in {}) {
+            //将数组的原型指向arrayMethods，这样当数组调用上述的7个方法时，其实是调用arrayMethods中的方法而不是调用Array.prototype中的方法
+            target.__proto__ = arrayMethods;
+          } else {
+            //如果浏览器不支持__proto__，则设置数组对应的属性，这样当数组调用上述的7个方法时，其实是调用数组对应属性指向的方法
+            for (let i = 0, l = methodsToPatch.length; i < l; i++) {
+              let key = methodsToPatch[i];
+              def(target, key, arrayMethods[key]);
+            }
+          }
+        };
+      })();
+      //测试
+      let arr = [1, 2, 3];
+      patchArray(arr, function (add, del) {
+        // if (add) console.log("这是新增的内容:", add);
+        // if (del) console.log("这是删除的内容:", del);
+      });
+      arr.splice(1, 2, "aa", "bb", "cc");
+    </script>
+    <script>
+      // canvas
+      var c = document.getElementById("myCanvas");
+      var ctx = c.getContext("2d");
+      ctx.fillStyle = "green";
+      ctx.fillRect(10, 10, 50, 50);
+
+      function copy() {
+        // ctx.getImageData 获取canvas对象的二进制数据
+        var imgData = ctx.getImageData(10, 10, 50, 50);
+        console.log(imgData);
+        ctx.putImageData(imgData, 10, 70);
+      }
+    </script>
+  </body>
+</html>
