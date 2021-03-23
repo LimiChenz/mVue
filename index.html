@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="app">
-        <input type="text" :value="message"/>
+        <input type="text" v-model="message" @change="onChange"/>
         <div>{{message}}</div>
         <div v-html="message"></div>
         <button @click="onClick">点击事件</button>
@@ -32,7 +32,11 @@
             methods: {
                 onClick(){
                     console.log('第一个vue');
-                }    
+                },
+                onChange(e){
+                    // console.log(e);
+                    this.message = e.target.value
+                }
             },
             template: `<div class="container">aaa</div>`,
         })

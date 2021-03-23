@@ -19,6 +19,7 @@ Dep.prototype.depend = function (key, sub) {
 }
 
 Dep.prototype.notify = function (key) {
+    // console.log(key, this.subs[key]);
     if (Array.isArray(this.subs[key])) {
         this.subs[key].forEach(element => {
             element.update()

@@ -17,7 +17,7 @@ function Observe(vm, data) {
 
 }
 
-function def(vm, key, value){
+function def(vm, key, value) {
     Object.defineProperty(vm, key, {
         value: value,
         enumerable: true,
@@ -28,7 +28,7 @@ function def(vm, key, value){
 
 Object.prototype.walk = function (vm, data) {
     for (const key in data) {
-        if (Object.hasOwnProperty.call(data,key)) {
+        if (Object.hasOwnProperty.call(data, key)) {
             // console.log(key, data[key]);
             this.definReactive(vm, data, key, data[key])
 
@@ -59,28 +59,23 @@ Observe.prototype.definReactive = function (vm, data, key, value) {
         configurable: false, //不可删除
         enumerable: true, //可迭代
         get: () => {
-            const ob = vm._ob_
-            ob.dep.depend(key, new Watcher(vm,key))
             console.log('getter', key)
             return value
         },
         set: (newValue) => {
             if (value === newValue) return
             console.log('setter', key, newValue)
-            data[key] = newValue
-            
+            value = newValue
+
             if (isObject(newValue) && !Array.isArray(newValue)) {
                 new Observe(vm, newValue)
             }
-            
+
             // notify
             const ob = vm._ob_
             ob.dep.notify(key)
         }
     })
 }
-
-
-
 
 export default Observe
