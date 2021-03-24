@@ -22,14 +22,15 @@ Vue.prototype._init = function (options) {
     // 暂时这样实现 - 非虚拟dom
     this._complieDom(this)
 
+    // 
+    // this._complie()
+
 }
 Vue.prototype._observe = function () {
     new Observe(this, this.$data)
 }
 Vue.prototype._render = function (vm, app) {
     if (!app) return
-    let methodsReg = /^@/g
-    let reg = /\{\{(.*?)\}\}/g
     app.childNodes.forEach(node => {
         if (node.nodeType === 1) {
             if (node.attributes.length > 0) {
