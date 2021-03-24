@@ -22,6 +22,7 @@ Vue.prototype._init = function (options) {
     // 暂时这样实现 - 非虚拟dom
     this._complieDom(this)
 
+    // this is dev branch
 }
 Vue.prototype._observe = function () {
     new Observe(this, this.$data)
