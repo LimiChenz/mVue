@@ -97,6 +97,7 @@
 
   function createElement (tag, data, children) {
     return new vnode(tag, data, normalizeChildren(children), undefined, undefined);
+    
   }
 
   function createElm (vnode) {
