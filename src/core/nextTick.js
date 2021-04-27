@@ -3,7 +3,7 @@ let has = {};
 let queue = [];
 let waiting = false;
 
-function queueWatcher (watcher: Watcher) {
+function queueWatcher (watcher) {
   const id = watcher.id
   // 防止queue队列wachter对象重复
   if (has[id] == null) {
