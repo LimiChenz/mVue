@@ -4,6 +4,8 @@
     var dep = new Dep();
     Object.defineProperty(obj, key, {
       get: function () {
+        // Dep.target 里存的是 watcher
+        // 数据get时触发 watcher 传入dep中
         if (Dep.target) {
           Dep.target.addDep(dep);
         }
@@ -16,7 +18,7 @@
       }
     })
   }
-
+  // 监听数据的变化并收集依赖触发更新   
   function observe (obj) {
     for (var key in obj) {
       defineReactive(obj, key, obj[key])
@@ -26,6 +28,7 @@
   var uid$1 = 0;
 
   function Dep () {
+    // 观察者列表
     this.subs = [];
     this.id = uid$1++;
   }
@@ -51,8 +54,11 @@
     this.value = this.get();
   }
 
+  // 订阅   
   Watcher.prototype.get = function () {
     Dep.target = this; /* ! */
+    console.log('target...', Dep.target);
+    console.log('getterfunction...', this.getter);
     var value = this.getter.call(this.vm);
     Dep.target = null;
     return value
@@ -97,7 +103,7 @@
 
   function createElement (tag, data, children) {
     return new vnode(tag, data, normalizeChildren(children), undefined, undefined);
-    
+
   }
 
   function createElm (vnode) {
@@ -140,6 +146,7 @@
   }
 
   function patchVnode (oldVnode, vnode) {
+    console.log('patchNode...', oldVnode, vnode);
     var elm = vnode.elm = oldVnode.elm;
     var oldCh = oldVnode.children;
     var ch = vnode.children;
@@ -155,6 +162,7 @@
 
   function updateChildren (oldCh, newCh) {
     // assume that every element node has only one child to simplify our diff algorithm
+    // diff
     if (sameVnode(oldCh[0], newCh[0])) {
       patchVnode(oldCh[0], newCh[0])
     } else {
@@ -168,8 +176,10 @@
       patchVnode(oldVnode, vnode);
     } else {
       if (isRealElement) {
+        // 复制给oldVnode 一个 vnode数
         oldVnode = emptyNodeAt(oldVnode);
       }
+      // 生成真实dom插入父节点  
       var elm = oldVnode.elm;
       var parent = elm.parentNode;
 
@@ -194,6 +204,7 @@
     observe(data)
   }
 
+  // 代理data 可以通过this.message 直接操作message   
   function proxy (vm, key) {
     Object.defineProperty(vm, key, {
       configurable: true,
@@ -286,6 +297,6 @@
   }, 1000)
 
   setTimeout(function () {
-    vm.isShow = false;
-  }, 2000)
+    vm.isShow = true;
+  }, 3000)
 })();
